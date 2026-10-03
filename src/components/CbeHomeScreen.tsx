@@ -288,7 +288,7 @@ export const CbeHomeScreen: React.FC<CbeHomeScreenProps> = ({
               </div>
               <div className="flex items-center gap-2">
                 <div className="text-base font-extrabold text-white leading-tight">
-                  {formatEnglishNameOnly(userName || 'Yared Nigussie')}
+                  {userName ? userName.trim().split(' ')[0] : 'Yared'}
                 </div>
               </div>
             </div>
