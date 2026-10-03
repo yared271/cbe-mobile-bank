@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Language, Transaction } from '../types/banking';
 import { formatCurrency, formatSimpleDate } from '../utils/smsParser';
+import { formatCbeName } from '../utils/userDatabase';
 import { getTranslation } from '../locales/translations';
 
 interface CbeReceiptSlipModalProps {
@@ -187,7 +188,7 @@ Verified & Settled via CBE Core Banking Network
             <div className="flex items-start justify-between py-1.5 border-b border-purple-900/80">
               <span className="text-purple-300">{t.cbePayer}</span>
               <div className="text-right">
-                <div className="font-bold text-white">{transaction.senderName}</div>
+                <div className="font-bold text-white">{formatCbeName(transaction.senderName)}</div>
                 <div className="font-mono text-[11px] text-purple-300">{transaction.senderAccount}</div>
               </div>
             </div>
@@ -195,7 +196,7 @@ Verified & Settled via CBE Core Banking Network
             <div className="flex items-start justify-between py-1.5 border-b border-purple-900/80">
               <span className="text-purple-300">{t.cbeBeneficiary}</span>
               <div className="text-right">
-                <div className="font-bold text-amber-200">{transaction.receiverName}</div>
+                <div className="font-bold text-amber-200">{formatCbeName(transaction.receiverName)}</div>
                 <div className="font-mono text-[11px] text-purple-300">
                   {transaction.receiverAccount.length > 10 ? `${transaction.receiverAccount[0]}*********${transaction.receiverAccount.slice(-4)}` : transaction.receiverAccount} ({transaction.receiverBank})
                 </div>

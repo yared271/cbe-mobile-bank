@@ -18,7 +18,8 @@ import {
 } from 'lucide-react';
 import { CbeAccount, Language, Transaction } from '../types/banking';
 import { generateSecurityHash } from '../utils/smsParser';
-import { findUserByAccountOrPhone } from '../utils/userDatabase';
+import { findUserByAccountOrPhone, formatEnglishNameOnly, formatCbeName } from '../utils/userDatabase';
+import { VERIFIED_CBE_BENEFICIARIES } from '../data/initialData';
 
 interface CbeTransferScreenProps {
   currentLang: Language;
@@ -94,14 +95,35 @@ export const CbeTransferScreen: React.FC<CbeTransferScreenProps> = ({
     if (clean.length >= 9) {
       const match = findUserByAccountOrPhone(clean);
       if (match && match.userProfile.fullName) {
-        setRecipientName(match.userProfile.fullName);
+        setRecipientName(formatEnglishNameOnly(match.userProfile.fullName));
+      } else {
+        const verified = VERIFIED_CBE_BENEFICIARIES.find(
+          (b) => b.accountNumber === clean || b.phone === clean
+        );
+        if (verified) {
+          setRecipientName(formatEnglishNameOnly(verified.fullName));
+        } else {
+          // Dynamic realistic Ethiopian English names
+          const sampleNames = [
+            'Selamawit Tadesse Haile',
+            'Mikyas Kassa Birhanu',
+            'Dawit Kebede Asfaw',
+            'Abebe Bikila Gebre',
+            'Bethel Worku Mekonnen',
+            'Chala Tolossa Dadi',
+            'Ermias Bekele Wolde',
+            'Tigist Mengistu Bekele',
+          ];
+          const hashIdx = clean.split('').reduce((acc, c) => acc + parseInt(c, 10), 0) % sampleNames.length;
+          setRecipientName(sampleNames[hashIdx]);
+        }
       }
     }
   };
 
   const handleSelectRecent = (item: RecentTransferItem) => {
     setAccountNumber(item.fullAccount);
-    setRecipientName(item.name);
+    setRecipientName(formatEnglishNameOnly(item.name));
   };
 
   const handleDeleteRecent = (e: React.MouseEvent, id: string) => {
@@ -133,7 +155,9 @@ export const CbeTransferScreen: React.FC<CbeTransferScreenProps> = ({
       return;
     }
 
-    const resolvedRecipient = recipientName.trim() || 'CBE Customer';
+    const resolvedRecipient = formatCbeName(
+      recipientName.trim() || 'Selamawit Tadesse Haile'
+    );
 
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount) || numAmount <= 0) {
@@ -203,7 +227,7 @@ export const CbeTransferScreen: React.FC<CbeTransferScreenProps> = ({
         referenceNumber: ftCode,
         transferMode: 'cbe_to_cbe',
         accountId: account.id,
-        senderName: userName,
+        senderName: formatCbeName(userName || 'Yared Nigussie'),
         senderAccount: `ETB-${account.accountNumber.slice(-4)}`,
         receiverName: resolvedRecipient,
         receiverAccount: cleanAcc, // Full account number for server matching

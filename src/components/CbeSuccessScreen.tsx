@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { CbeLogo } from './CbeLogo';
 import { Language, Transaction } from '../types/banking';
+import { formatEnglishNameOnly } from '../utils/userDatabase';
 
 // Authentic CBE Viewfinder Screenshot Icon (4 corner brackets + center lens circle matching IMG_20261001_132739_360.jpg)
 const ScreenshotViewfinderIcon: React.FC<{ className?: string }> = ({ className = "w-4.5 h-4.5" }) => (

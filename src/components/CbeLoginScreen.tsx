@@ -33,7 +33,6 @@ export const CbeLoginScreen: React.FC<CbeLoginScreenProps> = ({
   onLoginSuccess,
   onLoginWithPin,
   logoUrl,
-  onOpenLogoModal,
 }) => {
   const [pin, setPin] = useState('');
   const [showPin, setShowPin] = useState(false);
@@ -96,7 +95,7 @@ export const CbeLoginScreen: React.FC<CbeLoginScreenProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-800 flex flex-col justify-between w-full max-w-[420px] mx-auto relative shadow-2xl overflow-hidden font-sans select-none px-6 pt-3 pb-4">
+    <div className="min-h-screen sm:min-h-[860px] sm:my-6 bg-white text-slate-800 flex flex-col justify-between w-full max-w-[420px] mx-auto relative sm:rounded-[40px] sm:shadow-[0_25px_60px_rgba(0,0,0,0.3)] sm:border-[10px] sm:border-slate-900 overflow-hidden font-sans select-none px-6 pt-3 pb-4">
       {/* 1. Top Bar: Bell (Left), English Dropdown (Center), Grid (Right) */}
       <div className="flex items-center justify-between pt-1">
         {/* Left: Notification Bell Button */}
@@ -131,11 +130,8 @@ export const CbeLoginScreen: React.FC<CbeLoginScreenProps> = ({
       <form onSubmit={handleLogin} className="flex-1 flex flex-col justify-between items-center w-full pt-4 pb-1">
         {/* Upper Center Content: Logo, Titles, PIN, Biometrics */}
         <div className="flex flex-col items-center text-center w-full max-w-[340px] my-auto space-y-3.5">
-          {/* CBE Official Logo */}
-          <div 
-            onClick={onOpenLogoModal}
-            className="w-24 h-24 flex items-center justify-center bg-transparent cursor-pointer hover:scale-105 transition-transform"
-          >
+          {/* CBE Official Logo (Non-clickable) */}
+          <div className="w-24 h-24 flex items-center justify-center bg-transparent">
             <CbeLogo customUrl={logoUrl} isDarkBg={false} size="xl" className="w-24 h-24 object-contain bg-transparent" />
           </div>
 

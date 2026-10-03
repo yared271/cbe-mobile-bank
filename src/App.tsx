@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CbeAccount, Language, Transaction } from './types/banking';
-import { INITIAL_CBE_TRANSACTIONS } from './data/initialData';
+import { INITIAL_CBE_TRANSACTIONS, INITIAL_CBE_ACCOUNTS } from './data/initialData';
 import { CbeRegisterScreen } from './components/CbeRegisterScreen';
 import { CbeLoginScreen } from './components/CbeLoginScreen';
 import { CbeHomeScreen } from './components/CbeHomeScreen';
@@ -31,6 +31,8 @@ import {
   registerNewUser,
   executeBirrTransfer,
   updateUserRecord,
+  formatEnglishNameOnly,
+  formatCbeName,
 } from './utils/userDatabase';
 
 export default function App() {
@@ -59,11 +61,13 @@ export default function App() {
       const found = getUserByPhone(phone);
       if (found) return found.userProfile;
     }
+    const defaultUser = getUserByPhone('0911824902');
+    if (defaultUser) return defaultUser.userProfile;
     return {
-      fullName: '',
-      accountNumber: '',
-      phone: '',
-      pin: '',
+      fullName: 'Yared Nigussie',
+      accountNumber: '1000475184173',
+      phone: '0911824902',
+      pin: '1234',
     };
   });
 
@@ -73,30 +77,9 @@ export default function App() {
       const found = getUserByPhone(phone);
       if (found) return found.accounts;
     }
-    return [
-      {
-        id: 'cbe-primary',
-        nameEn: 'CBE Saving Account',
-        nameAm: 'የኢትዮጵያ ንግድ ባንክ የቁጠባ ሒሳብ',
-        accountNumber: '1000000000000',
-        accountTypeEn: 'Saving Account',
-        accountTypeAm: 'የቁጠባ ሒሳብ',
-        balance: 1000000.00,
-        currency: 'ETB',
-        isPrimary: true,
-      },
-      {
-        id: 'cbe-birr',
-        nameEn: 'CBE Birr Wallet',
-        nameAm: 'ንግድ ባንክ ብር (CBE Birr)',
-        accountNumber: '0900000000',
-        accountTypeEn: 'Mobile Wallet Account',
-        accountTypeAm: 'የሞባይል ዋሌት ሒሳብ',
-        balance: 14820.50,
-        currency: 'ETB',
-        isPrimary: false,
-      }
-    ];
+    const defaultUser = getUserByPhone('0911824902');
+    if (defaultUser) return defaultUser.accounts;
+    return INITIAL_CBE_ACCOUNTS;
   });
 
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
@@ -105,7 +88,9 @@ export default function App() {
       const found = getUserByPhone(phone);
       if (found) return found.transactions;
     }
-    return [];
+    const defaultUser = getUserByPhone('0911824902');
+    if (defaultUser) return defaultUser.transactions;
+    return INITIAL_CBE_TRANSACTIONS;
   });
 
   const [lastSuccessTx, setLastSuccessTx] = useState<Transaction>(() => ({
@@ -113,10 +98,10 @@ export default function App() {
     referenceNumber: 'FT262277V0S0',
     transferMode: 'cbe_to_cbe',
     accountId: 'cbe-primary',
-    senderName: userProfile.fullName,
-    senderAccount: 'ETB-0997',
-    receiverName: 'CBE Customer',
-    receiverAccount: 'ETB-8612',
+    senderName: 'Yared Nigussie',
+    senderAccount: 'ETB-4173',
+    receiverName: 'Selamawit Tadesse',
+    receiverAccount: '1000293847291',
     receiverBank: 'Commercial Bank of Ethiopia',
     amount: 2130.00,
     fee: 1.00,
@@ -124,7 +109,7 @@ export default function App() {
     currency: 'ETB',
     type: 'outflow',
     category: 'CBE to CBE Transfer',
-    timestamp: '2026-08-15T17:46:00.000Z',
+    timestamp: new Date().toISOString(),
     status: 'completed',
     note: 'MB Transfer',
     channel: 'CBE Mobile App',
@@ -367,10 +352,10 @@ export default function App() {
     // Ensure the formatted transaction preserves the full receiver account for server matching
     const formattedTx: Transaction = {
       ...newTx,
-      senderName: userProfile.fullName,
+      senderName: formatCbeName(userProfile.fullName || 'Yared Nigussie'),
       senderAccount: `ETB-${primaryAccount.accountNumber.slice(-4)}`,
-      receiverName: newTx.receiverName || 'CBE Customer',
-      receiverAccount: newTx.receiverAccount || 'CBE-GENERIC-ACC',
+      receiverName: formatCbeName(newTx.receiverName || 'Selamawit Tadesse Haile'),
+      receiverAccount: newTx.receiverAccount || '1000293847291',
     };
     handleAddTransaction(formattedTx);
     setLastSuccessTx(formattedTx);

@@ -12,14 +12,59 @@ export interface UserRecord {
   transactions: Transaction[];
 }
 
-const STORAGE_KEY = 'cbe_users_database_v5';
+export function formatCbeName(name: string): string {
+  if (!name || name.toLowerCase().includes('customer') || name.toLowerCase().includes('user')) {
+    return 'SELAMAWIT TADESSE HAILE (ሰላማዊት ታደሰ ኃይሌ)';
+  }
+  let cleaned = name.trim();
+  if (cleaned.includes('(')) {
+    return cleaned.toUpperCase();
+  }
+  const upper = cleaned.toUpperCase();
+  if (upper.includes('YARD') || upper.includes('YARED')) {
+    return 'YARED NIGUSSE (ያሬድ ንጉሴ)';
+  }
+  if (upper.includes('SELAM') || upper.includes('SELAMAWIT')) {
+    return 'SELAMAWIT TADESSE HAILE (ሰላማዊት ታደሰ ኃይሌ)';
+  }
+  if (upper.includes('ABEBE')) {
+    return 'ABEBE BIKILA GEBRE (አበበ ቢቂላ ገብሬ)';
+  }
+  if (upper.includes('DAWIT')) {
+    return 'DAWIT KEBEDE ASFAW (ዳዊት ከበደ አስፋው)';
+  }
+  if (upper.includes('MIKYAS') || upper.includes('MIKI')) {
+    return 'MIKYAS KASSA BIRHANU (ሚክያስ ካሳ ብርሃኑ)';
+  }
+  return `${upper} (${cleaned})`;
+}
+
+export function formatEnglishNameOnly(name: string): string {
+  if (!name) return 'Selamawit Tadesse';
+  let cleaned = name.trim();
+  if (
+    cleaned.toLowerCase() === 'customer' ||
+    cleaned.toLowerCase() === 'cbe customer' ||
+    cleaned.toLowerCase() === 'user'
+  ) {
+    return 'Selamawit Tadesse';
+  }
+  // Remove any parentheses with Amharic or English translations e.g. "(ያሬድ ንጉሴ)"
+  cleaned = cleaned.replace(/\s*\([\u1200-\u137F\s\w/.-]+\)/g, '');
+  // Remove any remaining Ethiopic characters
+  cleaned = cleaned.replace(/[\u1200-\u137F]/g, '');
+  cleaned = cleaned.replace(/\s+/g, ' ').trim();
+  return cleaned || 'Selamawit Tadesse';
+}
+
+const STORAGE_KEY = 'cbe_users_database_v7';
 const ACTIVE_PHONE_KEY = 'cbe_active_user_phone';
 const IS_REGISTERED_KEY = 'cbe_is_registered';
 
 const DEFAULT_USERS: Record<string, UserRecord> = {
   "0911824902": {
     userProfile: {
-      fullName: 'Customer',
+      fullName: 'Yared Nigussie (ያሬድ ንጉሴ)',
       accountNumber: '1000475184173',
       phone: '0911824902',
       pin: '1234',

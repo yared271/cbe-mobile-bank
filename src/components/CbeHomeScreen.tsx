@@ -41,6 +41,7 @@ import {
 import { CbeLogo } from './CbeLogo';
 import { CbeAccount, Language } from '../types/banking';
 import { formatCurrency } from '../utils/smsParser';
+import { formatEnglishNameOnly, formatCbeName } from '../utils/userDatabase';
 import { LanguageModal, EthiopiaFlagIcon, UsaFlagIcon } from './LanguageModal';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 
@@ -287,9 +288,7 @@ export const CbeHomeScreen: React.FC<CbeHomeScreenProps> = ({
               </div>
               <div className="flex items-center gap-2">
                 <div className="text-base font-extrabold text-white leading-tight">
-                  {(!userName || userName.toLowerCase().includes('yared') || userName === 'User' || userName === 'Customer')
-                    ? (currentLang === 'am' ? 'ደንበኛ' : 'Customer')
-                    : userName.split(' ')[0]}
+                  {formatEnglishNameOnly(userName || 'Yared Nigussie')}
                 </div>
               </div>
             </div>
@@ -783,7 +782,12 @@ export const CbeHomeScreen: React.FC<CbeHomeScreenProps> = ({
               {filteredTxs.length > 0 ? (
                 filteredTxs.map((tx: any) => {
                   const isInflow = tx.type === 'inflow';
-                  const partyName = tx.senderName || tx.receiverName || (isInflow ? 'Deposit' : 'Transfer');
+                  // For debited/outflow transfers, display the person you sent money to (receiverName)!
+                  // For credited/inflow transfers, display who sent you money (senderName)!
+                  const rawName = isInflow
+                    ? (tx.senderName || 'Deposit')
+                    : (tx.receiverName || tx.senderName || 'Transfer');
+                  const partyName = formatCbeName(rawName);
                   
                   return (
                     <div
